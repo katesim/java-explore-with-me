@@ -6,8 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class HitMapper {
-    private final static String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private final static DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern(DT_FORMAT);
+    private static final String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern(DT_FORMAT);
 
     public static Hit toHit(final HitDto hitDto) {
         try {
@@ -19,8 +19,7 @@ public class HitMapper {
                     .ip(hitDto.getIp())
                     .timestamp(timestamp)
                     .build();
-        }
-        catch (final DateTimeParseException exc) {
+        } catch (final DateTimeParseException exc) {
             throw new ValidationException(exc.getMessage(), exc);
         }
     }
