@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS stats
+(
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  app varchar(255) NOT NULL,
+  uri varchar(64) NOT NULL,
+  ip varchar(64),
+  timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL
+);
