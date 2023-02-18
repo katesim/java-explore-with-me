@@ -1,6 +1,7 @@
 package ru.practicum.ewm.hit;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -11,9 +12,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "stats", schema = "public")
+@Data
+@Builder
 @AllArgsConstructor
 public class Hit {
     @Id

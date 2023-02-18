@@ -8,16 +8,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@RequestMapping(path = "/hit")
 @RequiredArgsConstructor
 public class HitController {
 
+    private final HitService service;
+
     @PostMapping
     public ResponseEntity<Object> create(@Validated @RequestBody HitDto hitDto) {
-        log.info(hitDto.toString());
+        Hit saved = service.add(HitMapper.toHit(hitDto));
+        log.info("Saved: {}", saved.toString());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
