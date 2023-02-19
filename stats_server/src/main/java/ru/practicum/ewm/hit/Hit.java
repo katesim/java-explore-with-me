@@ -2,7 +2,7 @@ package ru.practicum.ewm.hit;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "stats", schema = "public")
-@Data
+@Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class Hit {
@@ -33,16 +33,4 @@ public class Hit {
 
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Hit)) return false;
-        return id != null && id.equals(((Hit) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }
