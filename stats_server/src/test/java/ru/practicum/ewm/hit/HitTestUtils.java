@@ -1,5 +1,7 @@
 package ru.practicum.ewm.hit;
 
+import ru.practicum.ewm.dto.HitDto;
+
 import java.time.LocalDateTime;
 
 public class HitTestUtils {

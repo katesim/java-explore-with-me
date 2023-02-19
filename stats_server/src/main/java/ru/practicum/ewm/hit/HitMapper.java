@@ -1,5 +1,7 @@
 package ru.practicum.ewm.hit;
 
+import ru.practicum.ewm.dto.HitDto;
+
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

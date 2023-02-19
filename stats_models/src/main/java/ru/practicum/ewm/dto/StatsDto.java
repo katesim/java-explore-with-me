@@ -1,20 +1,20 @@
-package ru.practicum.ewm.hit;
+package ru.practicum.ewm.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 
 @Data
 @Builder(toBuilder = true)
 @AllArgsConstructor
-public class HitDto {
+public class StatsDto {
     @NotBlank
     private String app;
     @NotBlank
     private String uri;
-    @NotBlank
-    private String ip;
-    private String timestamp;
+    @PositiveOrZero
+    private Long hits;
 }
