@@ -4,8 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<modules>
 		<module>stats_server</module>
+        <module>stats_models</module>
 		<module>main_server</module>
-	</modules>
+    </modules>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
