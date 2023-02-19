@@ -6,6 +6,7 @@
 		<module>stats_server</module>
         <module>stats_models</module>
 		<module>main_server</module>
+        <module>stats_client</module>
     </modules>
 
 	<parent>
