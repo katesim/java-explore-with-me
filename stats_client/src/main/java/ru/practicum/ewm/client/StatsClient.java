@@ -78,7 +78,7 @@ public class StatsClient {
             query.append("&uris={uris}");
         }
         if (unique != null) {
-            parameters.put("unique", uris);
+            parameters.put("unique", unique);
             query.append("&unique={unique}");
         }
 
