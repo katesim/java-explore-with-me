@@ -1,5 +1,7 @@
 package ru.practicum.ewm.hit;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.ewm.dto.HitDto;
 
 import javax.validation.ValidationException;
@@ -7,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HitMapper {
     private static final String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern(DT_FORMAT);
