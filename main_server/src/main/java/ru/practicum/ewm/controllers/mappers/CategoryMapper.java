@@ -1,7 +1,8 @@
-package ru.practicum.ewm.controllers.categories;
+package ru.practicum.ewm.controllers.mappers;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.practicum.ewm.controllers.dtos.CategoryDto;
 import ru.practicum.ewm.entities.Category;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

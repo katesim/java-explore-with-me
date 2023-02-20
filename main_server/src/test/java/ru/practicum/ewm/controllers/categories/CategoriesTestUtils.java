@@ -1,5 +1,6 @@
 package ru.practicum.ewm.controllers.categories;
 
+import ru.practicum.ewm.controllers.dtos.CategoryDto;
 import ru.practicum.ewm.entities.Category;
 
 import java.util.ArrayList;

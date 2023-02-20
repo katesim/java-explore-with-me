@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.controllers.dtos.CategoryDto;
+import ru.practicum.ewm.controllers.mappers.CategoryMapper;
 import ru.practicum.ewm.entities.Category;
 import ru.practicum.ewm.markers.Create;
 import ru.practicum.ewm.markers.Update;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.ewm.common.EWMConstants.PAGE_SIZE_DEFAULT_TEXT;
 import static ru.practicum.ewm.common.EWMConstants.PAGE_START_FROM_DEFAULT_TEXT;
-import static ru.practicum.ewm.controllers.categories.CategoryMapper.map;
+import static ru.practicum.ewm.controllers.mappers.CategoryMapper.map;
 
 @RestController
 @RequiredArgsConstructor

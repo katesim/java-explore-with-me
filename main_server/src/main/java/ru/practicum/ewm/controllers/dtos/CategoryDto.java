@@ -1,4 +1,4 @@
-package ru.practicum.ewm.controllers.categories;
+package ru.practicum.ewm.controllers.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
