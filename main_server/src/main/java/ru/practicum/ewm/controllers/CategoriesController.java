@@ -63,11 +63,13 @@ public class CategoriesController {
     // Public
 
     @GetMapping("/categories/{categoryId}")
+    @ResponseStatus(HttpStatus.OK)
     public CategoryDto getById(@PathVariable long categoryId) {
         return map(service.get(categoryId));
     }
 
     @GetMapping("/categories")
+    @ResponseStatus(HttpStatus.OK)
     public List<CategoryDto> getAll(
             @RequestParam(defaultValue = PAGE_START_FROM_DEFAULT_TEXT, required = false) @Min(0) int from,
             @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT, required = false) @Min(1) int size) {
