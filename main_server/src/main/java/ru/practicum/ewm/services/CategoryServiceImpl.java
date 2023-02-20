@@ -45,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void delete(Long categoryId) {
+    public void delete(Long categoryId) throws NotFoundException {
         this.get(categoryId);
         repo.deleteById(categoryId);
     }
