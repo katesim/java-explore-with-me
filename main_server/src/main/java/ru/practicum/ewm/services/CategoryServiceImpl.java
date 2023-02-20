@@ -30,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Category get(Long categoryId) throws NotFoundException {
+    public Category get(long categoryId) throws NotFoundException {
         Optional<Category> category = repo.findById(categoryId);
         if (category.isEmpty()) {
             final String errorMessage = String.format(NOT_FOUND_MSG_FORMAT, categoryId);
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void delete(Long categoryId) throws NotFoundException {
+    public void delete(long categoryId) throws NotFoundException {
         this.get(categoryId);
         repo.deleteById(categoryId);
     }

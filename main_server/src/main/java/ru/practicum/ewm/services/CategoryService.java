@@ -8,11 +8,11 @@ public interface CategoryService {
 
     Category create(Category category);
 
-    Category get(Long categoryId) throws NotFoundException;
+    Category get(long categoryId) throws NotFoundException;
 
     Page<Category> getAll(int from, int size);
 
     Category update(Category category);
 
-    void delete(Long categoryId) throws NotFoundException;
+    void delete(long categoryId) throws NotFoundException;
 }
