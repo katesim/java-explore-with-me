@@ -1,4 +1,4 @@
-package ru.practicum.ewm.controllers.categories;
+package ru.practicum.ewm.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

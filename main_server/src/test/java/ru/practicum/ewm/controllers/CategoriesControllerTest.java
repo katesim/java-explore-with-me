@@ -1,4 +1,4 @@
-package ru.practicum.ewm.controllers.categories;
+package ru.practicum.ewm.controllers;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
