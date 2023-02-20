@@ -43,10 +43,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.CATEGORY_ID;
-import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.generateCategories;
-import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.getDefaultCategoryDto;
-import static ru.practicum.ewm.controllers.utils.JsonTestUtils.configJsonProvider;
+import static ru.practicum.ewm.utils.CategoriesTestUtils.CATEGORY_ID;
+import static ru.practicum.ewm.utils.CategoriesTestUtils.generateCategories;
+import static ru.practicum.ewm.utils.CategoriesTestUtils.getDefaultCategoryDto;
+import static ru.practicum.ewm.utils.JsonTestUtils.configJsonProvider;
 import static ru.practicum.ewm.exceptions.ErrorCode.BAD_REQUEST;
 import static ru.practicum.ewm.exceptions.ErrorCode.CONFLICT;
 import static ru.practicum.ewm.exceptions.ErrorCode.NOT_FOUND;

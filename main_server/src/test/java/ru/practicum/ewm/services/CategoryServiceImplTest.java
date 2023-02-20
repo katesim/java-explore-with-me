@@ -26,8 +26,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.generateCategories;
-import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.getDefaultCategory;
+import static ru.practicum.ewm.utils.CategoriesTestUtils.generateCategories;
+import static ru.practicum.ewm.utils.CategoriesTestUtils.getDefaultCategory;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {

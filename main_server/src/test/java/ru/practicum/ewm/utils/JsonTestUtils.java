@@ -1,4 +1,4 @@
-package ru.practicum.ewm.controllers.utils;
+package ru.practicum.ewm.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;

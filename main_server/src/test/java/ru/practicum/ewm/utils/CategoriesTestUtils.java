@@ -1,4 +1,4 @@
-package ru.practicum.ewm.controllers.categories;
+package ru.practicum.ewm.utils;
 
 import ru.practicum.ewm.controllers.dtos.CategoryDto;
 import ru.practicum.ewm.entities.Category;
