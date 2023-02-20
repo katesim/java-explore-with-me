@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.entities.Category;
@@ -20,12 +19,11 @@ import static ru.practicum.ewm.controllers.categories.CategoryMapper.map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/admin/categories")
 public class CategoriesController {
 
     private final CategoryService service;
 
-    @PostMapping
+    @PostMapping("/admin/categories")
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto create(
             @Validated(Create.class) @RequestBody CategoryDto categoryDto) {
@@ -33,7 +31,7 @@ public class CategoriesController {
         return map(service.create(category));
     }
 
-    @PatchMapping("{categoryId}")
+    @PatchMapping("/admin/categories/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto update(
             @PathVariable long categoryId,
@@ -44,7 +42,7 @@ public class CategoriesController {
         return map(service.update(category));
     }
 
-    @DeleteMapping("{categoryId}")
+    @DeleteMapping("/admin/categories/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long categoryId) {
         service.delete(categoryId);
