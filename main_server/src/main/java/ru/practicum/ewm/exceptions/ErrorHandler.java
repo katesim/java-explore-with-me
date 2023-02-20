@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
@@ -45,7 +46,8 @@ public class ErrorHandler {
     @ExceptionHandler({
             ValidationException.class,
             MethodArgumentNotValidException.class,
-            IllegalArgumentException.class
+            IllegalArgumentException.class,
+            MethodArgumentTypeMismatchException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleValidationException(final Throwable exc) {

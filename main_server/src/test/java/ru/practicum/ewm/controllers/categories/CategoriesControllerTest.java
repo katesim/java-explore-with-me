@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -20,8 +21,11 @@ import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.services.CategoryService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,9 +36,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.CATEGORY_ID;
+import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.generateCategories;
 import static ru.practicum.ewm.controllers.categories.CategoriesTestUtils.getDefaultCategoryDto;
 import static ru.practicum.ewm.controllers.utils.JsonTestUtils.configJsonProvider;
 import static ru.practicum.ewm.exceptions.ErrorCode.BAD_REQUEST;
@@ -47,7 +55,9 @@ import static ru.practicum.ewm.exceptions.ErrorCode.NOT_FOUND;
 class CategoriesControllerTest {
 
     private static final String ADMIN_ENDPOINT = "/admin/categories";
-    private static final Long CATEGORY_ID = 123L;
+    private static final String PUBLIC_ENDPOINT = "/categories";
+    private static final int PAGE_START_FROM = 0;
+    private static final int PAGE_SIZE = 10;
 
     @Autowired
     private MockMvc mockMvc;
@@ -138,12 +148,51 @@ class CategoriesControllerTest {
     }
 
     @Test
+    void get_whenCategoryExists_return200() throws Exception {
+        CategoryDto categoryDto = getDefaultCategoryDto();
+        Category category = CategoryMapper.map(categoryDto);
+
+        when(categoryService.get(CATEGORY_ID)).thenReturn(category);
+
+        MvcResult result = mockMvc.perform(get(PUBLIC_ENDPOINT + "/" + CATEGORY_ID))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        assertThat(JsonPath.read(response, "$.id"), is(category.getId()));
+        assertThat(JsonPath.read(response, "$.name"), is(category.getName()));
+
+        verify(categoryService, times(1))
+                .get(CATEGORY_ID);
+        verifyNoMoreInteractions(categoryService);
+    }
+
+    @Test
+    void create_whenCategoryNotFound_return404() throws Exception {
+        when(categoryService.get(CATEGORY_ID)).thenThrow(new NotFoundException("test"));
+
+        MvcResult result = mockMvc.perform(get(PUBLIC_ENDPOINT + "/" + CATEGORY_ID))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        assertThat(JsonPath.read(response, "$.status"), is(NOT_FOUND.name()));
+        assertThat(JsonPath.read(response, "$.reason"), notNullValue());
+        assertThat(JsonPath.read(response, "$.message"), notNullValue());
+        assertThat(JsonPath.read(response, "$.timestamp"), notNullValue());
+
+        verify(categoryService, times(1))
+                .get(CATEGORY_ID);
+        verifyNoMoreInteractions(categoryService);
+    }
+
+    @Test
     void update_whenCategoryValid_return200() throws Exception {
         CategoryDto categoryDto = CategoryDto.builder()
                 .name("newName")
                 .build();
         Category category = Category.builder()
-                .id(123L)
+                .id(CATEGORY_ID)
                 .name("newName")
                 .build();
 
@@ -274,6 +323,55 @@ class CategoriesControllerTest {
 
         verify(categoryService, times(1))
                 .delete(CATEGORY_ID);
+        verifyNoMoreInteractions(categoryService);
+    }
+
+    @Test
+    void getAll() throws Exception {
+        List<Category> categories = generateCategories(PAGE_SIZE);
+        when(categoryService.getAll(PAGE_START_FROM, PAGE_SIZE))
+                .thenReturn(new PageImpl<>(categories));
+
+        mockMvc.perform(get(PUBLIC_ENDPOINT)
+                        .param("from", String.valueOf(PAGE_START_FROM))
+                        .param("size", String.valueOf(PAGE_SIZE)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(categories.size())));
+
+        verify(categoryService, times(1)).getAll(PAGE_START_FROM, PAGE_SIZE);
+        verifyNoMoreInteractions(categoryService);
+    }
+
+    @Test
+    void getAll_whenCategoriesEmpty_returnEmptyList() throws Exception {
+        List<Category> categories = new ArrayList<>();
+        when(categoryService.getAll(PAGE_START_FROM, PAGE_SIZE))
+                .thenReturn(new PageImpl<>(categories));
+
+        mockMvc.perform(get(PUBLIC_ENDPOINT)
+                        .param("from", String.valueOf(PAGE_START_FROM))
+                        .param("size", String.valueOf(PAGE_SIZE)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(categories.size())));
+
+        verify(categoryService, times(1)).getAll(PAGE_START_FROM, PAGE_SIZE);
+        verifyNoMoreInteractions(categoryService);
+    }
+
+    @Test
+    void getAll_whenParamsAreNotValid_return400() throws Exception {
+        MvcResult result = mockMvc.perform(get(PUBLIC_ENDPOINT)
+                        .param("from", "abc")
+                        .param("size", "test"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        assertThat(JsonPath.read(response, "$.status"), is(BAD_REQUEST.name()));
+        assertThat(JsonPath.read(response, "$.reason"), notNullValue());
+        assertThat(JsonPath.read(response, "$.message"), notNullValue());
+        assertThat(JsonPath.read(response, "$.timestamp"), notNullValue());
+
         verifyNoMoreInteractions(categoryService);
     }
 }
