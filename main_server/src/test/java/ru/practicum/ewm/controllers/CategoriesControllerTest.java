@@ -170,7 +170,7 @@ class CategoriesControllerTest {
     }
 
     @Test
-    void create_whenCategoryNotFound_return404() throws Exception {
+    void get_whenCategoryNotFound_return404() throws Exception {
         when(categoryService.get(CATEGORY_ID)).thenThrow(new NotFoundException("test"));
 
         MvcResult result = mockMvc.perform(get(PUBLIC_ENDPOINT + "/" + CATEGORY_ID))
