@@ -12,3 +12,25 @@ CREATE TABLE IF NOT EXISTS categories
   name VARCHAR(255) NOT NULL,
   CONSTRAINT UNIQ_CATEGORY_NAME UNIQUE (name)
 );
+
+CREATE TABLE IF NOT EXISTS events
+(
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  created_on TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  published_on TIMESTAMP WITHOUT TIME ZONE,
+  event_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  state VARCHAR(64) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  annotation TEXT,
+  participant_limit INTEGER NOT NULL CONSTRAINT positive_participant_limit CHECK (participant_limit > 0),
+  confirmed_requests INTEGER NOT NULL,
+  longitude FLOAT NOT NULL,
+  latitude FLOAT NOT NULL,
+  paid BOOL NOT NULL,
+  request_moderation BOOL NOT NULL,
+  initiator_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category_id BIGINT NOT NULL REFERENCES categories(id),
+
+  CHECK (confirmed_requests <= participant_limit)
+);
