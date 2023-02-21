@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> getAllWithUserIds(List<Long> userIds, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
-        return repo.findByUserIdInOrderByUserIdDesc(userIds, pageable);
+        return repo.findByIdInOrderByIdDesc(userIds, pageable);
     }
 
     @Override

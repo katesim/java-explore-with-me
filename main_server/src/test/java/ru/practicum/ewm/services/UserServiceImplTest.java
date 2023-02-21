@@ -99,14 +99,14 @@ class UserServiceImplTest {
         List<Long> ids = List.of(2L);
         Pageable pageable = PageRequest.of(PAGE_START_FROM, PAGE_SIZE);
 
-        when(userRepository.findByUserIdInOrderByUserIdDesc(eq(ids), eq(pageable)))
+        when(userRepository.findByIdInOrderByIdDesc(eq(ids), eq(pageable)))
                 .thenReturn(new PageImpl<>(users));
 
         Page<User> result = subject.getAllWithUserIds(ids, PAGE_START_FROM, PAGE_SIZE);
 
         assertEquals(result.stream().collect(Collectors.toList()), users);
         verify(userRepository, times(1))
-                .findByUserIdInOrderByUserIdDesc(eq(ids), eq(pageable));
+                .findByIdInOrderByIdDesc(eq(ids), eq(pageable));
         verifyNoMoreInteractions(userRepository);
     }
 
