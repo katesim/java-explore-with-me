@@ -10,9 +10,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -24,11 +27,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "created_on", nullable = false)
+    @Column(name = "created_on", nullable = false, updatable = false)
     private LocalDateTime createdOn;
 
     @Column(name = "published_on")
@@ -39,7 +43,7 @@ public class Event {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
-    private EventStatus state = EventStatus.DRAFT;
+    private EventStatus state = EventStatus.PENDING;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -68,9 +72,11 @@ public class Event {
     @Column(name = "request_moderation", nullable = false)
     private Boolean requestModeration;
 
-    @Column(name = "initiator_id", nullable = false)
-    private Long initiatorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "initiator_id", nullable = false, updatable = false)
+    private User initiator;
 
-    @Column(name = "category_id", nullable = false)
-    private Long categoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 }

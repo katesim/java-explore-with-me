@@ -75,6 +75,15 @@ public class ErrorHandler {
         return safeResponse(response);
     }
 
+    @ExceptionHandler(ForbiddenOperation.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleDataIntegrityViolationException(final ForbiddenOperation exc) {
+        log.error(exc.getClass().getSimpleName(), exc.getMessage());
+
+        final ErrorResponse response = prepareResponse(CONFLICT, "For the requested operation the conditions are not met.", exc);
+        return safeResponse(response);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(final Throwable exc) {
