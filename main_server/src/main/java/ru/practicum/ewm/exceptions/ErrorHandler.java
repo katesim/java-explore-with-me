@@ -88,6 +88,8 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(final Throwable exc) {
         log.error(exc.getClass().getSimpleName(), exc.getMessage());
+        exc.printStackTrace();
+
         return ResponseEntity.internalServerError().toString();
     }
 
