@@ -13,9 +13,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class UpdateEventUserRequestDto extends EventBaseDto {
+public class UpdateEventRequestDto extends EventBaseDto {
 
     private Long category;
 
-    private UpdateEventStateUserAction stateAction;
+    private UpdateEventStateAction stateAction;
 }

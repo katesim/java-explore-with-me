@@ -6,33 +6,25 @@ import ru.practicum.ewm.controllers.dtos.CategoryDto;
 import ru.practicum.ewm.controllers.dtos.CreateEventRequestDto;
 import ru.practicum.ewm.controllers.dtos.EventDto;
 import ru.practicum.ewm.controllers.dtos.LocationDto;
-import ru.practicum.ewm.controllers.dtos.UpdateEventUserRequestDto;
+import ru.practicum.ewm.controllers.dtos.UpdateEventRequestDto;
 import ru.practicum.ewm.controllers.dtos.UserShortDto;
 import ru.practicum.ewm.entities.Category;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.entities.User;
+import ru.practicum.ewm.utils.DateTimeUtils;
 
-import javax.validation.ValidationException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Optional;
+
+import static ru.practicum.ewm.utils.DateTimeUtils.format;
+import static ru.practicum.ewm.utils.DateTimeUtils.parse;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
 
-    private static final String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern(DT_FORMAT);
-
     public static Event map(final CreateEventRequestDto eventDto) {
-        final LocalDateTime eventDate;
-
-        try {
-            eventDate = LocalDateTime.parse(eventDto.getEventDate(), DT_FORMATTER);
-        } catch (final DateTimeParseException exc) {
-            throw new ValidationException(exc.getMessage(), exc);
-        }
+        final LocalDateTime eventDate = parse(eventDto.getEventDate());
 
         return Event.builder()
                 .title(eventDto.getTitle())
@@ -47,15 +39,11 @@ public class EventMapper {
                 .build();
     }
 
-    public static Event map(final UpdateEventUserRequestDto eventDto) {
+    public static Event map(final UpdateEventRequestDto eventDto) {
         LocalDateTime eventDate = null;
 
         if (eventDto.getEventDate() != null) {
-            try {
-                eventDate = LocalDateTime.parse(eventDto.getEventDate(), DT_FORMATTER);
-            } catch (final DateTimeParseException exc) {
-                throw new ValidationException(exc.getMessage(), exc);
-            }
+            eventDate = parse(eventDto.getEventDate());
         }
 
         final Optional<LocationDto> locationDto = Optional.ofNullable(eventDto.getLocation());
@@ -93,15 +81,15 @@ public class EventMapper {
                 .state(event.getState())
                 .initiator(initiatorDto)
                 .category(categoryDto)
-                .createdOn(event.getCreatedOn().format(DT_FORMATTER))
+                .createdOn(format(event.getCreatedOn()))
                 .publishedOn(
                         Optional.ofNullable(event.getPublishedOn())
-                                .map((x) -> x.format(DT_FORMATTER))
+                                .map(DateTimeUtils::format)
                                 .orElse(null))
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .annotation(event.getAnnotation())
-                .eventDate(event.getEventDate().format(DT_FORMATTER))
+                .eventDate(format(event.getEventDate()))
                 .location(locationDto)
                 .participantLimit(event.getParticipantLimit())
                 .confirmedRequests(event.getConfirmedRequests())

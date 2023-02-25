@@ -18,11 +18,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static ru.practicum.ewm.exceptions.ErrorCode.BAD_REQUEST;
 import static ru.practicum.ewm.exceptions.ErrorCode.CONFLICT;
 import static ru.practicum.ewm.exceptions.ErrorCode.NOT_FOUND;
+import static ru.practicum.ewm.utils.DateTimeUtils.format;
 
 @Slf4j
 @RestControllerAdvice
@@ -37,9 +37,6 @@ public class ErrorHandler {
         private String message;
         private String timestamp;
     }
-
-    private static final String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern(DT_FORMAT);
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -105,7 +102,7 @@ public class ErrorHandler {
             final ErrorCode code,
             final String reason,
             final Throwable exc) {
-        final String timestamp = LocalDateTime.now().format(DT_FORMATTER);
+        final String timestamp = format(LocalDateTime.now());
         return ErrorResponse.builder()
                 .status(code.name())
                 .reason(reason)
