@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.controllers.dtos.SortType;
 import ru.practicum.ewm.controllers.dtos.UpdateEventStateAction;
 import ru.practicum.ewm.controllers.dtos.CreateEventRequestDto;
 import ru.practicum.ewm.controllers.dtos.EventDto;
@@ -49,6 +50,7 @@ public class EventsController {
 
     private static final String USER_EVENTS_ENDPOINT_PREFIX = "/users/{userId}/events";
     private static final String ADMIN_EVENTS_ENDPOINT_PREFIX = "/admin/events";
+    private static final String PUBLIC_EVENTS_ENDPOINT_PREFIX = "/events";
 
     private static final Set<UpdateEventStateAction> USER_ALLOWED_UPDATE_EVENT_STATE_ACTIONS
             = Set.of(UpdateEventStateAction.SEND_TO_REVIEW, UpdateEventStateAction.CANCEL_REVIEW);
@@ -191,6 +193,55 @@ public class EventsController {
         final Event savedEvent = eventService.updateById(updateEventBuilder.build(), eventId);
         log.info("Saved event: {}", savedEvent);
         return map(savedEvent);
+    }
+
+    // Public
+
+    @GetMapping(PUBLIC_EVENTS_ENDPOINT_PREFIX)
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventDto> search(
+            @RequestParam(required = false) String text,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false) Boolean paid,
+            @RequestParam(defaultValue = "false", required = false) Boolean onlyAvailable,
+            @RequestParam(defaultValue = "EVENT_DATE", required = false) String sort,
+            @RequestParam(required = false) String rangeStart,
+            @RequestParam(required = false) String rangeEnd,
+            @RequestParam(defaultValue = PAGE_START_FROM_DEFAULT_TEXT, required = false) @Min(0) int from,
+            @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT, required = false) @Min(1) int size
+    ) {
+        LocalDateTime eventDateStart = Optional.ofNullable(rangeStart)
+                .map(DateTimeUtils::parse)
+                .orElse(null);
+        final LocalDateTime eventDateEnd = Optional.ofNullable(rangeEnd)
+                .map(DateTimeUtils::parse)
+                .orElse(null);
+
+        SortType sortType;
+        try {
+            sortType = SortType.valueOf(sort);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException(String.format("Invalid value for 'sort': %s", sort));
+        }
+
+        // Если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события,
+        // которые произойдут позже текущей даты и времени.
+        if (eventDateStart == null && eventDateEnd == null) {
+            eventDateStart = LocalDateTime.now();
+        }
+
+        return eventService.searchPublishedEvents(
+                        text, paid, onlyAvailable, categories, eventDateStart, eventDateEnd, sortType, from, size)
+                .stream()
+                .map(EventMapper::map)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping(PUBLIC_EVENTS_ENDPOINT_PREFIX + "/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+    public EventDto getById(@PathVariable long eventId) {
+        final Event event = eventService.getById(eventId, EventStatus.PUBLISHED);
+        return map(event);
     }
 
     private void validateEventStateUpdateUserAction(

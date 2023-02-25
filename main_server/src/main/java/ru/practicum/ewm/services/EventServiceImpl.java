@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.controllers.dtos.SortType;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.entities.EventStatus;
 import ru.practicum.ewm.exceptions.ForbiddenOperation;
@@ -71,9 +72,47 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<Event> searchPublishedEvents(
+            final String text,
+            final Boolean paid,
+            final Boolean onlyAvailable,
+            final List<Long> categories,
+            final LocalDateTime rangeStart,
+            final LocalDateTime rangeEnd,
+            final SortType sort,
+            int from,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        return SortType.EVENT_DATE.equals(sort)
+                ? repo.searchPublishedEventsOrderByEventDateAsc(
+                    text,
+                    paid,
+                    onlyAvailable,
+                    categories,
+                    rangeStart,
+                    rangeEnd,
+                    pageable)
+                : null; // TODO: add sort by views
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<Event> getAllByUserId(long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         return repo.findAllByInitiatorId(userId, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Event getById(long eventId, @NonNull final EventStatus state) throws NotFoundException {
+        Optional<Event> event = repo.findByIdAndStateEquals(eventId, state);
+        if (event.isEmpty()) {
+            final String errorMessage = String.format(NOT_FOUND_MSG_FORMAT, eventId);
+            log.error(errorMessage);
+            throw new NotFoundException(errorMessage);
+        }
+        return event.get();
     }
 
     @Override
