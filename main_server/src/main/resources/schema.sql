@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS events
   title VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
   annotation TEXT,
-  participant_limit INTEGER NOT NULL CONSTRAINT positive_participant_limit CHECK (participant_limit > 0),
+  participant_limit INTEGER NOT NULL CONSTRAINT positive_participant_limit CHECK (participant_limit >= 0),
   confirmed_requests INTEGER NOT NULL,
   longitude FLOAT NOT NULL,
   latitude FLOAT NOT NULL,
@@ -33,4 +33,14 @@ CREATE TABLE IF NOT EXISTS events
   category_id BIGINT NOT NULL REFERENCES categories(id),
 
   CHECK (confirmed_requests <= participant_limit)
+);
+
+CREATE TABLE IF NOT EXISTS requests
+(
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  created_on TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  status VARCHAR(64) NOT NULL,
+  event_id BIGINT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  requester_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT UNIQ_REQUEST_PER_EVENT UNIQUE (event_id, requester_id)
 );

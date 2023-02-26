@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.Column;
@@ -57,6 +58,7 @@ public class Event {
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
 
+    @Setter
     @Column(name = "confirmed_requests", nullable = false)
     private Integer confirmedRequests;
 
