@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.entities.Comment;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.entities.EventStatus;
 import ru.practicum.ewm.exceptions.ForbiddenOperation;
@@ -30,6 +31,7 @@ public class EventServiceImpl implements EventService {
     private static final String ADMIN_PUBLISH_EVENT_IS_REJECTED_ERROR_MSG_FORMAT = "Cannot publish the event because it's not in the right state: %s";
     private static final String ADMIN_CANCEL_EVENT_IS_REJECTED_ERROR_MSG_FORMAT = "Cannot cancel the event because it's not in the right state: %s";
     private static final String INVALID_EVENT_DATE_ERROR_MSG_FORMAT = "eventDate должно содержать дату после: %s";
+    private static final String COMMENT_TO_NON_PUBLISHED_ERROR_MSG_FORMAT = "коментировать можно только опубликованные события: %s";
 
     private static final int MINIMAL_EVENT_DATE_HOURS = 2;
     private static final int MINIMAL_PUBLISH_DATE_HOURS = 1;
@@ -147,9 +149,9 @@ public class EventServiceImpl implements EventService {
 
         final LocalDateTime now = LocalDateTime.now();
 
-        if (updateEvent.getEventDate() != null) {
-            validateEventDate(updateEvent.getEventDate(), now.plusHours(MINIMAL_EVENT_DATE_HOURS));
-        }
+    if (updateEvent.getEventDate() != null) {
+        validateEventDate(updateEvent.getEventDate(), now.plusHours(MINIMAL_EVENT_DATE_HOURS));
+    }
 
         if (EventStatus.PUBLISHED.equals(updateEvent.getState())) {
             if (event.getState() != EventStatus.PENDING) {
@@ -172,6 +174,23 @@ public class EventServiceImpl implements EventService {
 
         final Event updatedEvent = this.updateEvent(event, updateEvent).build();
         return repo.save(updatedEvent);
+    }
+
+    @Override
+    @Transactional
+    public Event addComment(
+            final Comment comment,
+            long eventId
+    ) throws NotFoundException, ForbiddenOperation {
+        final Event event = getById(eventId);
+        if (event.getState() != EventStatus.PUBLISHED) {
+            throw new ForbiddenOperation(
+                    String.format(COMMENT_TO_NON_PUBLISHED_ERROR_MSG_FORMAT, event.getState())
+            );
+        }
+
+        event.addComment(comment);
+        return repo.save(event);
     }
 
     @Override
