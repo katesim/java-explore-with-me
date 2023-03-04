@@ -142,7 +142,7 @@ public class EventServiceImpl implements EventService {
         }
 
         if (EventStatus.PUBLISHED.equals(updateEvent.getState())) {
-            if (event.getState() == EventStatus.CANCELED) {
+            if (event.getState() != EventStatus.PENDING) {
                 throw new ForbiddenOperation(
                         String.format(ADMIN_PUBLISH_EVENT_IS_REJECTED_ERROR_MSG_FORMAT, event.getState())
                 );
