@@ -178,7 +178,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public Event updateByEventIdAndUserId(final Event updateEvent, long userId, long eventId)
+    public Event updateByEventIdAndUserId(final Event updateEvent, long eventId, long userId)
             throws NotFoundException, ForbiddenOperation {
         final Event event = getByIdAndUserId(eventId, userId);
 
