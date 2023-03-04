@@ -98,6 +98,12 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Event> getAllFilterByIds(@NonNull List<Long> eventIds) {
+        return repo.findAllById(eventIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<Event> getAllByUserId(long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         return repo.findAllByInitiatorId(userId, pageable);

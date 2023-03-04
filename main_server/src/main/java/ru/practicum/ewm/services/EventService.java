@@ -37,6 +37,8 @@ public interface EventService {
             int size
     );
 
+    List<Event> getAllFilterByIds(@NonNull List<Long> eventIds);
+
     Page<Event> getAllByUserId(long userId, int from, int size);
 
     Event getById(long eventId) throws NotFoundException;
