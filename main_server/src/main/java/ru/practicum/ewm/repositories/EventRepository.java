@@ -45,12 +45,22 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE u.id = ?1")
     Page<Event> findAllByInitiatorId(long userId, Pageable pageable);
 
+    @Query("SELECT e " +
+            "FROM Event AS e " +
+            "JOIN e.initiator AS u " +
+            "JOIN e.category AS c " +
+            "WHERE (:users IS NULL OR u.id IN :users) " +
+            "  AND (:categories IS NULL OR c.id IN :categories) " +
+            "  AND (CAST(:rangeStart AS timestamp) IS NULL OR e.eventDate >= :rangeStart) " +
+            "  AND (CAST(:rangeEnd AS timestamp) IS NULL OR e.eventDate <= :rangeEnd) " +
+            "  AND (:states IS NULL OR e.state IN :states) "
+    )
     Page<Event> findAllByInitiatorIdInAndCategoryIdInAndEventDateIsAfterAndEventDateIsBeforeAndStateIn(
-            final List<Long> users,
-            final List<Long> categories,
-            final LocalDateTime rangeStart,
-            final LocalDateTime rangeEnd,
-            final List<EventStatus> states,
+            @Param("users") final List<Long> users,
+            @Param("categories") final List<Long> categories,
+            @Param("rangeStart") final LocalDateTime rangeStart,
+            @Param("rangeEnd") final LocalDateTime rangeEnd,
+            @Param("states") final List<EventStatus> states,
             Pageable pageable
     );
 
