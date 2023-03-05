@@ -37,5 +37,5 @@ public class EventDto extends EventBaseDto {
     private Integer confirmedRequests;
 
     @PositiveOrZero
-    private Integer views;
+    private Long views;
 }

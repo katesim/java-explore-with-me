@@ -2,7 +2,6 @@ package ru.practicum.ewm.services;
 
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
-import ru.practicum.ewm.controllers.dtos.SortType;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.entities.EventStatus;
 import ru.practicum.ewm.exceptions.ForbiddenOperation;
@@ -32,7 +31,6 @@ public interface EventService {
             final List<Long> categories,
             final LocalDateTime rangeStart,
             final LocalDateTime rangeEnd,
-            final SortType sort,
             int from,
             int size
     );

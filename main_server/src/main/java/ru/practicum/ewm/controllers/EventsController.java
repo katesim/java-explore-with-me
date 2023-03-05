@@ -19,6 +19,7 @@ import ru.practicum.ewm.controllers.dtos.CreateEventRequestDto;
 import ru.practicum.ewm.controllers.dtos.EventDto;
 import ru.practicum.ewm.controllers.dtos.UpdateEventRequestDto;
 import ru.practicum.ewm.controllers.mappers.EventMapper;
+import ru.practicum.ewm.dto.StatsDto;
 import ru.practicum.ewm.entities.Category;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.entities.EventStatus;
@@ -27,13 +28,18 @@ import ru.practicum.ewm.markers.Create;
 import ru.practicum.ewm.markers.Update;
 import ru.practicum.ewm.services.CategoryService;
 import ru.practicum.ewm.services.EventService;
+import ru.practicum.ewm.services.HitService;
 import ru.practicum.ewm.services.UserService;
 import ru.practicum.ewm.utils.DateTimeUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -60,6 +66,7 @@ public class EventsController {
     private final UserService userService;
     private final EventService eventService;
     private final CategoryService categoryService;
+    private final HitService hitService;
 
     // Private
 
@@ -208,7 +215,8 @@ public class EventsController {
             @RequestParam(required = false) String rangeStart,
             @RequestParam(required = false) String rangeEnd,
             @RequestParam(defaultValue = PAGE_START_FROM_DEFAULT_TEXT, required = false) @Min(0) int from,
-            @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT, required = false) @Min(1) int size
+            @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT, required = false) @Min(1) int size,
+            HttpServletRequest request
     ) {
         LocalDateTime eventDateStart = Optional.ofNullable(rangeStart)
                 .map(DateTimeUtils::parse)
@@ -230,18 +238,59 @@ public class EventsController {
             eventDateStart = LocalDateTime.now();
         }
 
-        return eventService.searchPublishedEvents(
-                        text, paid, onlyAvailable, categories, eventDateStart, eventDateEnd, sortType, from, size)
+        final List<Event> events = eventService.searchPublishedEvents(
+                        text, paid, onlyAvailable, categories, eventDateStart, eventDateEnd, from, size)
                 .stream()
-                .map(EventMapper::map)
                 .collect(Collectors.toList());
+
+        final List<String> uris = events.stream()
+                .map(e -> String.format("events/%d", e.getId()))
+                .collect(Collectors.toList());
+
+        final Map<String, StatsDto> stats = hitService.getStats(uris);
+        log.info("Stats {}", stats);
+
+        final String ip = request.getRemoteAddr();
+        final String uri = request.getRequestURI();
+        this.recordHitAndLog(uri, ip);
+
+        List<EventDto> eventDtos = events.stream()
+                .map(e -> map(e).toBuilder()
+                        .views(Optional.ofNullable(stats.get(uri))
+                                .map(StatsDto::getHits)
+                                .orElse(null))
+                        .build())
+                .collect(Collectors.toList());
+
+        if (SortType.VIEWS.equals(sortType)) {
+            eventDtos = eventDtos.stream()
+                    .sorted(Comparator.comparing(EventDto::getViews))
+                    .collect(Collectors.toList());
+        }
+
+        return eventDtos;
     }
 
     @GetMapping(PUBLIC_EVENTS_ENDPOINT_PREFIX + "/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventDto getById(@PathVariable long eventId) {
+    public EventDto getById(
+            @PathVariable long eventId,
+            HttpServletRequest request
+    ) {
         final Event event = eventService.getById(eventId, EventStatus.PUBLISHED);
-        return map(event);
+
+        final String ip = request.getRemoteAddr();
+        final String uri = request.getRequestURI();
+        this.recordHitAndLog(uri, ip);
+
+        final Map<String, StatsDto> stats = hitService.getStats(List.of(uri));
+        log.info("Stats {}", stats);
+
+        return map(event).toBuilder()
+                .views(Optional.ofNullable(stats.get(uri))
+                        .map(StatsDto::getHits)
+                        .orElse(null))
+                .build();
     }
 
     private void validateEventStateUpdateUserAction(
@@ -258,5 +307,12 @@ public class EventsController {
         if (!ADMIN_ALLOWED_UPDATE_EVENT_STATE_ACTIONS.contains(stateAction)) {
             throw new ValidationException("Not allowed state update for Admin");
         }
+    }
+
+    private void recordHitAndLog(@NotNull String uri, @NotNull String ip) {
+        log.info("client ip: {}", ip);
+        log.info("endpoint path: {}", uri);
+
+        hitService.recordHit(uri, ip);
     }
 }
