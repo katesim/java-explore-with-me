@@ -17,7 +17,6 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private static final String NOT_FOUND_MSG_FORMAT = "User with id=%d was not found";
@@ -43,12 +42,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<User> getAll(int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         return repo.findAll(pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<User> getAllWithUserIds(List<Long> userIds, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         return repo.findByIdInOrderByIdDesc(userIds, pageable);

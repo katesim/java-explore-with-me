@@ -41,6 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Category> getAll(int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         return repo.findAll(pageable);
