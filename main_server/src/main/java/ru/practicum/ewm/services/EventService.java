@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface EventService {
 
-    Event create(Event event);
+    Event create(final Event event);
 
     Page<Event> search(
             final List<Long> users,
@@ -35,7 +35,7 @@ public interface EventService {
             int size
     );
 
-    List<Event> getAllFilterByIds(@NonNull List<Long> eventIds);
+    List<Event> getAllFilterByIds(@NonNull final List<Long> eventIds);
 
     Page<Event> getAllByUserId(long userId, int from, int size);
 

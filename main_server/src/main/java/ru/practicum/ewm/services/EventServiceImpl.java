@@ -38,14 +38,20 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public Event create(Event event) {
+    public Event create(final Event event) {
         final LocalDateTime now = LocalDateTime.now();
 
         if (event.getEventDate() != null) {
             validateEventDate(event.getEventDate(), now.plusHours(MINIMAL_EVENT_DATE_HOURS));
         }
 
-        return repo.save(event);
+        final Event newEvent = event.toBuilder()
+                .createdOn(now)
+                .state(EventStatus.PENDING)
+                .confirmedRequests(0)
+                .build();
+
+        return repo.save(newEvent);
     }
 
     @Override
@@ -96,7 +102,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Event> getAllFilterByIds(@NonNull List<Long> eventIds) {
+    public List<Event> getAllFilterByIds(@NonNull final List<Long> eventIds) {
         return repo.findAllById(eventIds);
     }
 

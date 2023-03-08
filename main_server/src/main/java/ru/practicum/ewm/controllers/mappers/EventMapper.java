@@ -8,6 +8,7 @@ import ru.practicum.ewm.controllers.dtos.EventDto;
 import ru.practicum.ewm.controllers.dtos.LocationDto;
 import ru.practicum.ewm.controllers.dtos.UpdateEventRequestDto;
 import ru.practicum.ewm.controllers.dtos.UserShortDto;
+import ru.practicum.ewm.dto.StatsDto;
 import ru.practicum.ewm.entities.Category;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.entities.User;
@@ -58,6 +59,14 @@ public class EventMapper {
                 .participantLimit(eventDto.getParticipantLimit())
                 .paid(eventDto.getPaid())
                 .requestModeration(eventDto.getRequestModeration())
+                .build();
+    }
+
+    public static EventDto map(final Event event, final StatsDto stats) {
+        return map(event).toBuilder()
+                .views(Optional.ofNullable(stats)
+                        .map(StatsDto::getHits)
+                        .orElse(null))
                 .build();
     }
 

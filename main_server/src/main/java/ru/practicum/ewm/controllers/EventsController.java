@@ -76,18 +76,12 @@ public class EventsController {
             @PathVariable long userId,
             @Validated(Create.class) @RequestBody CreateEventRequestDto eventDto
     ) {
-        Event event = map(eventDto);
-
-        final LocalDateTime now = LocalDateTime.now();
         final User user = userService.get(userId);
         final Category category = categoryService.get(eventDto.getCategory());
 
-        event = event.toBuilder()
+        final Event event = map(eventDto).toBuilder()
                 .initiator(user)
                 .category(category)
-                .createdOn(now)
-                .state(EventStatus.PENDING)
-                .confirmedRequests(0)
                 .build();
 
         log.info("Create event: {}", event);
@@ -255,11 +249,7 @@ public class EventsController {
         this.recordHitAndLog(uri, ip);
 
         List<EventDto> eventDtos = events.stream()
-                .map(e -> map(e).toBuilder()
-                        .views(Optional.ofNullable(stats.get(uri))
-                                .map(StatsDto::getHits)
-                                .orElse(null))
-                        .build())
+                .map(e -> map(e, stats.get(String.format("events/%d", e.getId()))))
                 .collect(Collectors.toList());
 
         if (SortType.VIEWS.equals(sortType)) {
@@ -286,11 +276,7 @@ public class EventsController {
         final Map<String, StatsDto> stats = hitService.getStats(List.of(uri));
         log.info("Stats {}", stats);
 
-        return map(event).toBuilder()
-                .views(Optional.ofNullable(stats.get(uri))
-                        .map(StatsDto::getHits)
-                        .orElse(null))
-                .build();
+        return map(event, stats.get(uri));
     }
 
     private void validateEventStateUpdateUserAction(
