@@ -22,7 +22,6 @@ import ru.practicum.ewm.services.EventService;
 import ru.practicum.ewm.services.UserService;
 
 import javax.validation.ValidationException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,7 +72,6 @@ public class EventRequestsController {
         final User requester = userService.get(userId);
 
         final EventRequest eventRequest = EventRequest.builder()
-                .createdOn(LocalDateTime.now())
                 .requester(requester)
                 .event(event)
                 .build();

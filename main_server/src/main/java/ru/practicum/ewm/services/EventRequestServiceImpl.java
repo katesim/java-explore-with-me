@@ -14,6 +14,7 @@ import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.repositories.EventRepository;
 import ru.practicum.ewm.repositories.EventRequestRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -62,6 +63,8 @@ public class EventRequestServiceImpl implements EventRequestService {
         } else {
             newEventRequestBuilder.status(EventRequestState.PENDING);
         }
+
+        newEventRequestBuilder.createdOn(LocalDateTime.now());
 
         return eventRequestRepository.save(newEventRequestBuilder.build());
     }
