@@ -96,24 +96,10 @@ public class EventRequestsController {
             @PathVariable long eventId,
             @RequestBody EventRequestStatusUpdateRequestDto eventRequestStatusUpdateRequestDto
     ) {
-        final Event event = eventService.getById(eventId);
-
         final List<Long> requestIds = eventRequestStatusUpdateRequestDto.getRequestIds();
+
         final EventRequestStatusUpdateResponseDto.EventRequestStatusUpdateResponseDtoBuilder<?, ?> responseBuilder
                 = EventRequestStatusUpdateResponseDto.builder();
-
-        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
-            final List<EventRequestDto> confirmedEventRequests = eventRequestService.getAllForEventIdByInitiator(
-                            requestIds, eventId, userId
-                    )
-                    .stream()
-                    .map(EventRequestMapper::map)
-                    .collect(Collectors.toList());
-
-            return responseBuilder
-                    .confirmedRequests(confirmedEventRequests)
-                    .build();
-        }
 
         final EventRequestStatusUpdateRequestDto.EventRequestStatusUpdateAction statusUpdateAction
                 = eventRequestStatusUpdateRequestDto.getStatus();

@@ -18,12 +18,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static ru.practicum.ewm.common.EWMConstants.EVENT_NOT_FOUND_MSG_FORMAT;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-    private static final String NOT_FOUND_MSG_FORMAT = "Event with id=%d was not found";
     private static final String NOT_FOUND_FOR_USER_ERROR_MSG_FORMAT = "Event with id=%d was not found or it's not owned by userId=%d";
     private static final String USER_UPDATE_ON_PUBLISHED_EVENT_IS_REJECTED_ERROR_MSG = "Only pending or canceled events can be changed by user";
     private static final String ADMIN_PUBLISH_EVENT_IS_REJECTED_ERROR_MSG_FORMAT = "Cannot publish the event because it's not in the right state: %s";
@@ -111,7 +112,7 @@ public class EventServiceImpl implements EventService {
     public Event getById(long eventId, @NonNull final EventStatus state) throws NotFoundException {
         Optional<Event> event = repo.findByIdAndStateEquals(eventId, state);
         if (event.isEmpty()) {
-            final String errorMessage = String.format(NOT_FOUND_MSG_FORMAT, eventId);
+            final String errorMessage = String.format(EVENT_NOT_FOUND_MSG_FORMAT, eventId);
             log.error(errorMessage);
             throw new NotFoundException(errorMessage);
         }
@@ -123,7 +124,7 @@ public class EventServiceImpl implements EventService {
     public Event getById(long eventId) throws NotFoundException {
         Optional<Event> event = repo.findById(eventId);
         if (event.isEmpty()) {
-            final String errorMessage = String.format(NOT_FOUND_MSG_FORMAT, eventId);
+            final String errorMessage = String.format(EVENT_NOT_FOUND_MSG_FORMAT, eventId);
             log.error(errorMessage);
             throw new NotFoundException(errorMessage);
         }

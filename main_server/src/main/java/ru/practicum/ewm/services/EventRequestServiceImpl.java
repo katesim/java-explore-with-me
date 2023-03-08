@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static ru.practicum.ewm.common.EWMConstants.EVENT_NOT_FOUND_MSG_FORMAT;
+
 
 @Slf4j
 @Service
@@ -113,10 +115,17 @@ public class EventRequestServiceImpl implements EventRequestService {
             long eventId,
             long initiatorId
     ) throws NotFoundException, ForbiddenOperation {
+        final Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MSG_FORMAT, eventId)));
+
+        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
+            return this.getAllForEventIdByInitiator(
+                    requestIds, eventId, initiatorId
+            );
+        }
+
         final List<EventRequest> eventRequests = this.getAllForEventIdByInitiator(requestIds, eventId, initiatorId);
         final List<EventRequest> confirmedEventRequests = new ArrayList<>();
-        final Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
 
         for (final EventRequest eventRequest : eventRequests) {
             if (!EventRequestState.PENDING.equals(eventRequest.getStatus())) {
