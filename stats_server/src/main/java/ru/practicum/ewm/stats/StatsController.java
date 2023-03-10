@@ -49,9 +49,14 @@ public class StatsController {
                         : service.countHits(startDateTime, endDateTime, uris);
             }
 
-            return result.stream()
+            final List<StatsDto> stats = result.stream()
                     .map(StatsController::toStatsDto)
                     .collect(Collectors.toList());
+
+            log.info("Query: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
+            log.info("Stats: {}", stats);
+
+            return stats;
         } catch (final DateTimeParseException exc) {
             throw new ValidationException(exc.getMessage(), exc);
         }

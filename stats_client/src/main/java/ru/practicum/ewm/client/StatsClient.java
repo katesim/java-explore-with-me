@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -18,9 +19,11 @@ import ru.practicum.ewm.dto.HitDto;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class StatsClient {
     private static final String HIT_ENDPOINT = "/hit";
     private static final String STATS_ENDPOINT = "/stats";
@@ -37,14 +40,14 @@ public class StatsClient {
                 .build();
     }
 
-    public ResponseEntity<Object> getStats(
+    public List<LinkedHashMap> getStats(
             final LocalDateTime start,
             final LocalDateTime end
     ) {
         return getStats(start, end, null, null);
     }
 
-    public ResponseEntity<Object> getStats(
+    public List<LinkedHashMap> getStats(
             final LocalDateTime start,
             final LocalDateTime end,
             @Nullable List<String> uris
@@ -52,7 +55,7 @@ public class StatsClient {
         return getStats(start, end, uris, null);
     }
 
-    public ResponseEntity<Object> getStats(
+    public List<LinkedHashMap> getStats(
             final LocalDateTime start,
             final LocalDateTime end,
             @Nullable Boolean unique
@@ -60,7 +63,7 @@ public class StatsClient {
         return getStats(start, end, null, unique);
     }
 
-    public ResponseEntity<Object> getStats(
+    public List<LinkedHashMap> getStats(
             final LocalDateTime start,
             final LocalDateTime end,
             @Nullable List<String> uris,
@@ -74,15 +77,18 @@ public class StatsClient {
         StringBuilder query = new StringBuilder("?start={start}&end={end}");
 
         if (uris != null) {
-            parameters.put("uris", uris);
-            query.append("&uris={uris}");
+            for (final String uri : uris) {
+                query.append("&uris=");
+                query.append(uri);
+            }
         }
         if (unique != null) {
             parameters.put("unique", unique);
             query.append("&unique={unique}");
         }
 
-        return get(STATS_ENDPOINT + query, parameters);
+        ResponseEntity<List> response = rest.getForEntity(STATS_ENDPOINT + query, List.class, parameters);
+        return response.getBody();
     }
 
     public ResponseEntity<Object> recordHit(HitDto body) {
