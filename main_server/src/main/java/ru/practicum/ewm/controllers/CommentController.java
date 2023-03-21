@@ -41,8 +41,8 @@ public class CommentController {
     @GetMapping(ADMIN_COMMENTS_ENDPOINT_PREFIX)
     @ResponseStatus(HttpStatus.OK)
     public List<CommentDto> getAll(
-            @RequestParam(defaultValue = PAGE_START_FROM_DEFAULT_TEXT, required = false) @Min(0) int from,
-            @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT, required = false) @Min(1) int size
+            @RequestParam(defaultValue = PAGE_START_FROM_DEFAULT_TEXT) @Min(0) int from,
+            @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT) @Min(1) int size
     ) {
         return commentService.getAll(from, size).stream()
                 .map(CommentMapper::map)
@@ -124,8 +124,8 @@ public class CommentController {
     @ResponseStatus(HttpStatus.OK)
     public List<CommentDto> getAll(
             @PathVariable long eventId,
-            @RequestParam(defaultValue = PAGE_START_FROM_DEFAULT_TEXT, required = false) @Min(0) int from,
-            @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT, required = false) @Min(1) int size
+            @RequestParam(defaultValue = PAGE_START_FROM_DEFAULT_TEXT) @Min(0) int from,
+            @RequestParam(defaultValue = PAGE_SIZE_DEFAULT_TEXT) @Min(1) int size
     ) {
         return commentService.getAllByEventId(eventId, from, size).stream()
                 .map(CommentMapper::map)
