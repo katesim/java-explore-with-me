@@ -2,6 +2,7 @@ package ru.practicum.ewm.services;
 
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
+import ru.practicum.ewm.entities.Comment;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.entities.EventStatus;
 import ru.practicum.ewm.exceptions.ForbiddenOperation;
@@ -45,6 +46,8 @@ public interface EventService {
 
     Event updateById(final Event updateEvent, long eventId)
             throws NotFoundException, ForbiddenOperation;
+
+    Event addComment(final Comment comment, long eventId) throws NotFoundException, ForbiddenOperation;
 
     Event getByIdAndUserId(long eventId, long userId) throws NotFoundException;
 
